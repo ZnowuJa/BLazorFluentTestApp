@@ -1,0 +1,201 @@
+﻿@* Invoice Edit Component *@
+
+@using Application.ITWarehouseCQRS.Companies.Queries
+@using Application.ITWarehouseCQRS.Currencies.Queries
+@using MediatR
+
+@inject IMediator _mediator;
+@implements IDialogContentComponent<InvoiceVm>
+
+@* Header *@
+<FluentDialogHeader ShowDismiss="true">
+    <FluentStack VerticalAlignment="VerticalAlignment.Center">
+        <FluentIcon Value="@(new Icons.Regular.Size24.WindowApps())" />
+        <FluentLabel Typo="Typography.PaneHeader">
+            @Dialog.Instance.Parameters.Title
+        </FluentLabel>
+    </FluentStack>
+</FluentDialogHeader>
+
+@* Footer *@
+<FluentDialogFooter>
+    <FluentButton Appearance="Appearance.Accent" OnClick="@SaveAsync"
+                  Disabled="@(!_editContext.Validate())">
+        Save
+    </FluentButton>
+    <FluentButton Appearance="Appearance.Neutral" OnClick="@CancelAsync">Cancel</FluentButton>
+</FluentDialogFooter>
+
+@* Body *@
+<FluentDialogBody Orientation="Orientation.Horizontal">
+    <EditForm EditContext="_editContext">
+        <FluentValidationValidator @ref="_fluentValidator" />
+
+        <FluentGrid Justify="@Justification">
+            <FluentGridItem xs="6" sm="4">
+                <div class="card">
+
+                    <FluentTextField Id="Number" @bind-Value="@Content.Number" Placeholder="Enter number"> Number: </FluentTextField>
+                    <FluentValidationMessage For="@(() => Content.Number)" />
+
+                </div>
+            </FluentGridItem>
+            <FluentGridItem xs="6" sm="4">
+                <div class="card">
+                    <FluentDatePicker Id="Date" @bind-Value="@Content.Date"> Date: </FluentDatePicker>
+                    <FluentValidationMessage For="@(() => Content.Date)" />
+                </div>
+            </FluentGridItem>
+            <FluentGridItem xs="6" sm="4">
+                <div class="card">
+                    @{
+                        // Check if it's an Edit operation
+
+                        if (Content.Id != 0)
+                        {
+                            <FluentSelect TOption="CompanyVm"
+                                          Label="Select company..."
+                                          Items="@itemCompanyList"
+                                          Id="Id"
+                                          Width="150px"
+                                          Height="250px"
+                                          OptionValue="@(p => p.Id.ToString())"
+                                          OptionText="@(p => p.Name)"
+                                          @bind-SelectedOption="@Content.CompanyVm" />
+                        }
+                        else
+                        {
+                            // For new records
+                            <FluentSelect TOption="CompanyVm"
+                                          Label="Select company..."
+                                          Items="@itemCompanyList"
+                                          Id="Id"
+                                          Width="150px"
+                                          Height="250px"
+                                          OptionValue="@(p => p.Id.ToString())"
+                                          OptionText="@(p => p.Name)"
+                                          @bind-SelectedOption="@SelectedCompany" />
+                        }
+                    }
+
+                    <FluentValidationMessage For="@(() => Content.CompanyVm.Name)" />
+                </div>
+            </FluentGridItem>
+            <FluentGridItem xs="6" sm="4">
+                <div class="card">
+                    <FluentNumberField Id="TotalNet" @bind-Value="@Content.TotalNet" Placeholder="total..."> Total: </FluentNumberField>
+                    <FluentValidationMessage For="@(() => Content.TotalNet)" />
+                </div>
+            </FluentGridItem>
+            <FluentGridItem xs="6" sm="4">
+                <div class="card">
+                    @{
+                        // Check if it's an Edit operation
+
+                        if (Content.Id != 0)
+                        {
+                            <FluentSelect TOption="CurrencyVm"
+                                          Label="Select currency..."
+                                          Items="@itemCurrencyList"
+                                          Id="Id"
+                                          Width="150px"
+                                          Height="250px"
+                                          OptionValue="@(p => p.Id.ToString())"
+                                          OptionText="@(p => p.Name)"
+                                          @bind-SelectedOption="@Content.CurrencyVm" />
+                        }
+                        else
+                        {
+                            // For new records
+                            <FluentSelect TOption="CurrencyVm"
+                                          Label="Select currency..."
+                                          Items="@itemCurrencyList"
+                                          Id="Id"
+                                          Width="150px"
+                                          Height="250px"
+                                          OptionValue="@(p => p.Id.ToString())"
+                                          OptionText="@(p => p.Name)"
+                                          @bind-SelectedOption="@SelectedCurrency" />
+                        }
+                    }
+
+                    <FluentValidationMessage For="@(() => Content.CurrencyVm.Name)" />
+                </div>
+            </FluentGridItem>
+        </FluentGrid>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="validation-error"><p style="color:red;">@errorMessage</p></div>
+        }
+    </EditForm>
+</FluentDialogBody>
+
+
+@code {
+    [Parameter]
+    public InvoiceVm Content { get; set; } = default!;
+
+    [CascadingParameter]
+    public FluentDialog Dialog { get; set; } = default!;
+
+    JustifyContent Justification = JustifyContent.FlexStart;
+
+    private EditContext _editContext;
+
+    private FluentValidationValidator? _fluentValidator;
+    private string errorMessage;
+
+    private IQueryable<CompanyVm> itemCompanyList { get; set; }
+    private IQueryable<CurrencyVm> itemCurrencyList { get; set; }
+    private CompanyVm SelectedCompany { get; set; } = new CompanyVm { };
+    private CurrencyVm SelectedCurrency { get; set; } = new CurrencyVm { };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _editContext = new EditContext(Content);
+        itemCompanyList = await _mediator.Send(new GetAllCompaniesForSelectQuery());
+        itemCurrencyList = await _mediator.Send(new GetAllCurrenciesForSelectQuery());
+        base.OnInitialized();
+    }
+
+    private async Task SaveAsync()
+    {
+        Console.WriteLine("SaveAsync starts...");
+        if (_editContext.Validate())
+        {
+            Console.WriteLine("EditContext Validation OK!...");
+        }
+        else
+        {
+            Console.WriteLine("EditContext Validation NOT OK!...");
+            return;
+        }
+        if (Content.Id != 0)
+        {
+            await Dialog.CloseAsync(Content);
+        }
+        else
+        {
+            if (SelectedCompany.Id != 0 || SelectedCurrency.Id != 0)
+            {
+                Content.CompanyVm = SelectedCompany;
+                Content.CurrencyVm = SelectedCurrency;
+                await Dialog.CloseAsync(Content);
+            }
+            else
+            {
+                Console.WriteLine();
+                errorMessage = "Plese select Company or Currency!";
+            }
+        }
+    }
+
+    private async Task CancelAsync()
+    {
+        await Dialog.CancelAsync();
+    }
+
+}
+
+

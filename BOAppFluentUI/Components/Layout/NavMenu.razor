@@ -1,0 +1,68 @@
+﻿
+<div class="navmenu">
+@*     <input type="checkbox" title="Menu expand/collapse toggle" id="navmenu-toggle" class="navmenu-icon" />
+    <label for="navmenu-toggle" class="navmenu-icon"><FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill" /></label> *@
+    <nav class="sitenav" aria-labelledby="main-menu" onclick="document.getElementById('navmenu-toggle').click();">
+        <FluentNavMenu Id="main-menu" Collapsible="true" Width="250" Title="Navigation menu" @bind-Expanded="expanded">
+
+            <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Start</FluentNavLink>
+            <FluentNavGroup OnClick="OnClick" Title="IT CMDB" Icon="@(new Icons.Regular.Size24.DesktopPulse())">
+                <ChildContent>
+                    <FluentNavLink Href="category" Icon="@(new Icons.Regular.Size20.ArrowShuffle())">Warehouse</FluentNavLink>
+                    <FluentNavLink Href="category" Icon="@(new Icons.Regular.Size20.AlbumAdd())">Delivery</FluentNavLink>
+                    <FluentNavLink Href="categorytype" Icon="@(new Icons.Regular.Size20.ReceiptMoney())">Sales</FluentNavLink>
+                    <FluentNavLink Href="categorytype" Icon="@(new Icons.Regular.Size20.Delete())">Scrap</FluentNavLink>
+                    <FluentNavLink Href="category" Icon="@(new Icons.Regular.Size20.TrayItemAdd())">Parts</FluentNavLink>
+
+                </ChildContent>
+            </FluentNavGroup>
+            <FluentNavGroup OnClick="OnClick" Title="IT CMDB Settings" Icon="@(new Icons.Regular.Size20.EarthLeaf())">
+                <ChildContent>
+
+
+                    <FluentNavGroup OnClick="OnClick" Title="Dictionaries" Icon="@(new Icons.Regular.Size20.EarthLeaf())">
+                        <ChildContent>
+
+                            <FluentNavLink Href="categories" Icon="@(new Icons.Regular.Size20.Classification())">Categories</FluentNavLink>
+                            <FluentNavLink Href="categorytypes" Icon="@(new Icons.Regular.Size20.Classification())">Category Types</FluentNavLink>
+                            <FluentNavLink Href="companies" Icon="@(new Icons.Regular.Size20.BuildingFactory())">Companies</FluentNavLink>
+                            <FluentNavLink Href="companytypes" Icon="@(new Icons.Regular.Size20.BuildingFactory())">Company Types</FluentNavLink>
+                            <FluentNavLink Href="currency" Icon="@(new Icons.Regular.Size20.CurrencyDollarEuro())">Currencies</FluentNavLink>
+                            
+                            <FluentNavLink Href="units" Icon="@(new Icons.Regular.Size20.Note())">Units</FluentNavLink>
+                            <FluentNavLink Href="notes" Icon="@(new Icons.Regular.Size20.Note())">Notes</FluentNavLink>
+                            <FluentNavLink Href="states" Icon="@(new Icons.Regular.Size20.Note())">States</FluentNavLink>
+                            <FluentNavLink Href="vendors" Icon="@(new Icons.Regular.Size20.Note())">Vendors</FluentNavLink>
+                            <FluentNavLink Href="warehouses" Icon="@(new Icons.Regular.Size20.Note())">Warehouses</FluentNavLink>
+                            <FluentNavLink Href="parts" Icon="@(new Icons.Regular.Size20.Note())">Parts</FluentNavLink>
+                            
+                            <FluentNavLink Href="employeetypes" Icon="@(new Icons.Regular.Size20.PeopleTeamToolbox())">Employee Types</FluentNavLink>
+                            
+                        </ChildContent>
+                    </FluentNavGroup>
+                    
+
+                    <FluentNavGroup OnClick="OnClick" Title="In/Out Items" Icon="@(new Icons.Regular.Size20.EarthLeaf())">
+                        <ChildContent>
+
+                            <FluentNavLink Href="catypes" Icon="@(new Icons.Regular.Size20.LeafOne())">Delivery</FluentNavLink>
+                            <FluentNavLink Href="categorytype" Icon="@(new Icons.Regular.Size20.LeafTwo())">Sales</FluentNavLink>
+                            
+                        </ChildContent>
+                    </FluentNavGroup>
+                    
+                </ChildContent>
+            </FluentNavGroup>
+        </FluentNavMenu>
+    </nav>
+</div>
+
+@code {
+    private bool expanded = true;
+    
+    void OnClick(MouseEventArgs e)
+    {
+        Console.WriteLine("NavMenu item clicked");
+    }
+}
+

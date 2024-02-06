@@ -1,0 +1,155 @@
+﻿@page "/Invoices"
+@using Application.ITWarehouseCQRS.Invoices
+@using Application.ITWarehouseCQRS.Invoices.Queries
+@using Application.ITWarehouseCQRS.Invoices.Commands
+@using BOAppFluentUI.Components.Pages.ITWarehouseAdmin.Invoice
+@using MediatR
+
+@inject IMediator _mediator
+@inject ILogger<Invoice_Page> _logger
+@inject IDialogService _dialogService
+@inject IToastService _toastService
+
+
+<h3>Invoices</h3>
+
+@if (Invoice == null)
+{
+    <FluentProgressRing>Loading...</FluentProgressRing>
+
+}
+else
+{
+
+    <FluentDataGrid Items="@Invoice" TGridItem="InvoiceVm" GridTemplateColumns="50px repeat(4, 1fr) 0.5fr 0.5fr" ResizableColumns=true>
+        <PropertyColumn Property="@(c => c.Id)" Sortable="true" Align="Align.Start" Tooltip="true" />
+        <PropertyColumn Property="@(c => c.Number)" Sortable="true" Align="Align.Start" Tooltip="true" />
+        <PropertyColumn Property="@(c => c.Date)" Sortable="true" Align="Align.Start" Tooltip="true" />
+        <PropertyColumn Property="@(c => c.CompanyVm.Name)" Sortable="true" Align="Align.Start" Tooltip="true" />
+        <PropertyColumn Property="@(c => c.TotalNet)" Sortable="true" Align="Align.Start" Tooltip="true" />
+        <PropertyColumn Property="@(c => c.CurrencyVm.Name)" Sortable="true" Align="Align.Start" Tooltip="true" />
+
+
+        <TemplateColumn Title="Actions" Align="Align.End">
+            <FluentButton IconEnd="@(new Icons.Regular.Size20.BookOpen())" OnClick="@(() => View(context))" />
+            <FluentButton IconEnd="@(new Icons.Regular.Size20.Edit())" OnClick="@(() => EditType(context))" />
+            <FluentButton IconEnd="@(new Icons.Regular.Size20.Delete())" OnClick="@(() => Delete(context))" />
+
+        </TemplateColumn>
+    </FluentDataGrid>
+    <FluentButton IconStart="@(new Icons.Regular.Size24.Add())" OnClick="@(() => AddPanel())" />
+}
+
+
+
+@code {
+    private IQueryable<InvoiceVm> Invoice;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+    private async Task Load()
+    {
+        Invoice = await _mediator.Send(new GetAllInvoicesQuery());
+        foreach( var c in Invoice)
+        {
+            Console.WriteLine( c.Number);
+        }
+
+    }
+    private async Task EditType(InvoiceVm item)
+    {
+        ToastIntent intent;
+        string message = string.Empty;
+        int i = 0;
+
+        var data = item;
+        var dialog = await _dialogService.ShowDialogAsync<Invoice_Edit_Component>(data, new DialogParameters()
+            {
+                Height = "500px",
+                Width = "720px",
+                Title = data.Id > 0 ? "Update Invoice..." : "Create Invoice...",
+                PreventDismissOnOverlayClick = false,
+                PreventScroll = true,
+            });
+        var result = await dialog.Result;
+
+
+        if (!result.Cancelled && result.Data != null)
+        {
+            item = (InvoiceVm)result.Data;
+            if (item.Id > 0)
+            {
+                i = await _mediator.Send(new UpdateInvoiceCommand(item.Id, item.Number, item.CompanyVm, item.Date, item.TotalNet, item.CurrencyVm, item.ItemsGenerated));
+                intent = ToastIntent.Success;
+                message = "Invoice has been updated!";
+            }
+            else if (item.Id == 0)
+            {
+                Console.WriteLine("Tu weszlismy?" + item.Number + item.CompanyVm.Name + item.CurrencyVm.Name);
+
+                i = await _mediator.Send(new CreateInvoiceCommand(item.Number, item.CompanyVm, item.Date, item.TotalNet, item.CurrencyVm, item.ItemsGenerated));
+                intent = ToastIntent.Success;
+                message = "Invoice has been Created!";
+            }
+            else
+            {
+                intent = ToastIntent.Warning;
+                message = "Something went realy wrong!";
+            }
+
+        }
+        else if (result.Cancelled)
+        {
+            intent = ToastIntent.Info;
+            message = "Update Cancelled...";
+        }
+        else
+        {
+            intent = ToastIntent.Error;
+            message = "Something went wrong!!!";
+        }
+
+
+        await Load();
+        _toastService.ShowToast(intent, message, 3000);
+
+        Console.WriteLine(result.GetType());
+    }
+
+    private async Task AddPanel()
+    {
+        InvoiceVm item = new InvoiceVm { Id = 0, Number = string.Empty, CompanyVm = new CompanyVm(), CurrencyVm = new CurrencyVm(), TotalNet = new decimal(), Date = new DateTime() };
+        // await EditCatTypePanel(ctVm);
+        await EditType(item);
+        
+    }
+
+    private async Task View(InvoiceVm item)
+    {
+        await _dialogService.ShowInfoAsync(message: $"Invoice id: {item.Id}, name: {item.Number}, currency name: {item.CurrencyVm.Name}, company name: {item.CompanyVm.Name}");
+    }
+
+    private async Task Delete(InvoiceVm item)
+    {
+        ToastIntent intent;
+        string message = string.Empty;
+
+        var i = await _mediator.Send(new DeleteInvoiceCommand(item.Id));
+
+        if (i == item.Id)
+        {
+            intent = ToastIntent.Success;
+            message = "Invoice has been deleted!";
+        }
+        else
+        {
+            intent = ToastIntent.Error;
+            message = "Something went wrong!!!";
+        }
+        await Load();
+        _toastService.ShowToast(intent, message, 3000);
+
+    }
+}

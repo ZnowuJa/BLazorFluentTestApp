@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ClientViewModels\ITWarehouse\**" />
+    <Compile Remove="Components\Pages\ITWarehouseAdmin\Invoice\**" />
+    <Content Remove="ClientViewModels\ITWarehouse\**" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Invoice\**" />
+    <EmbeddedResource Remove="ClientViewModels\ITWarehouse\**" />
+    <EmbeddedResource Remove="Components\Pages\ITWarehouseAdmin\Invoice\**" />
+    <None Remove="ClientViewModels\ITWarehouse\**" />
+    <None Remove="Components\Pages\ITWarehouseAdmin\Invoice\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Category\CategoryComponent.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Category\CategoryPage.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Category\CategoryTypeCRUD.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Category\CategoryTypeDeletePage.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Category\Category_Page2.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Category\Category_Page2_Component.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Spady\CategoryTypeAddEdit_C.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Spady\CategoryTypeAdd_C.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Spady\CategoryTypeDG_C.razor" />
+    <Content Remove="Components\Pages\ITWarehouseAdmin\Spady\CategoryTypeP.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Blazored.FluentValidation" Version="2.1.0" />
+	<PackageReference Include="FluentValidation" Version="11.9.0" />
+	<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+	<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
+	<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.1" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.1" />
+	<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.1" />
+	<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.1" />
+	<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.1" />
+	<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
+	<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.1">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.*-* " />
+	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.DataGrid.EntityFrameworkAdapter" Version="4.3.1" />
+	<PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.3.1" />
+    <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.*-* " />
+    <PackageReference Include="Microsoft.Identity.Web" Version="2.16.1" />
+    <PackageReference Include="Microsoft.Identity.Web.UI" Version="2.16.1" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\Persistance\Persistance.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientViewModels\" />
+    <Folder Include="Components\Pages\ITWarehouseAdmin\Components\" />
+    <Folder Include="Components\Pages\ITWarehouse\Invoice\" />
+  </ItemGroup>
+</Project>
